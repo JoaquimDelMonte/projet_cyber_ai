@@ -22,7 +22,7 @@ df.columns = df.columns.str.strip()
 train, test = train_test_split(df, test_size=0.2, random_state=RANDOM_STATE_SEED)
 
 # Sélectionner toutes les colonnes numériques (en excluant la colonne "Label")
-numerical_columns = [col for col in train.columns if col != "Label"]
+numerical_columns = [col for col in train.columns if col not in ["Label", "IP"]]
 
 # Appliquer la normalisation Min-Max sur les données d'entraînement et de test
 scaler = MinMaxScaler().fit(train[numerical_columns])
