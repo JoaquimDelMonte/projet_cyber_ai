@@ -7,6 +7,20 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import seaborn as sns
 
+
+##### FONCTIONS UTILITAIRES #####
+
+def generate_random_ip():
+    """Génère une adresse IPv4 aléatoire."""
+    return ".".join(str(np.random.randint(1, 255)) for _ in range(4))
+
+
+
+#################################
+
+
+
+
 # Charger le nouveau dataset
 df = pd.read_csv("./DDoS_dataset.csv")
 df2 = pd.read_csv("./02-14-2018_processed.csv")
@@ -35,6 +49,17 @@ df_balanced = pd.concat([df_benign, df_ddos, df_ftp, df_ssh], axis=0).reset_inde
 
 # Remplacer les labels textuels par des valeurs numériques (0 pour BENIGN, 1 pour DDoS)
 df_balanced.replace({"Benign": 0, "DDoS": 1, "FTP-BruteForce" : 2, "SSH-Bruteforce" : 3}, inplace=True)
+
+# Génération d'une colonne d'IP aléatoires
+df_balanced["IP"] = [generate_random_ip() for _ in range(len(df_balanced))]
+
+# Déplacer la colonne "IP" en première position
+cols = ["IP"] + [col for col in df_balanced.columns if col != "IP"]
+df_balanced = df_balanced[cols]
+
+# Sauvegarde
+df_balanced.to_csv("dataset_new_balanced.csv", index=False)
+print("✅ Traitement des données terminé ! Dataset sauvegardé sous 'dataset_new_balanced.csv'")
 
 # Sauvegarder le dataset prétraité et équilibré
 df_balanced.to_csv("dataset_new_balanced.csv", index=False)
