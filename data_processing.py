@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import seaborn as sns
+from datasets import load_dataset
 
 
 ##### FONCTIONS UTILITAIRES #####
@@ -20,11 +21,16 @@ def generate_random_ip():
 
 
 
+# Charger les deux fichiers individuellement
 
-# Charger le nouveau dataset
-df = pd.read_csv("./DDoS_dataset.csv")
-df2 = pd.read_csv("./02-14-2018_processed.csv")
-df_combined = pd.concat([df,df2])
+dataset1 = load_dataset("pauldereep/projet_cyber_ai", data_files="DDoS_dataset.csv")["train"]
+dataset2 = load_dataset("pauldereep/projet_cyber_ai", data_files="02-14-2018_processed.csv")["train"]
+
+# Convertir en DataFrame pandas
+df1 = dataset1.to_pandas()
+df2 = dataset2.to_pandas()
+
+df_combined = pd.concat([df1,df2])
 
 # Nettoyer les noms de colonnes (supprimer les espaces en début et fin)
 df_combined.columns = df_combined.columns.str.strip()
