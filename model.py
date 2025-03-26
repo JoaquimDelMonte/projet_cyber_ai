@@ -22,17 +22,23 @@ df.columns = df.columns.str.strip()
 train, test = train_test_split(df, test_size=0.2, random_state=RANDOM_STATE_SEED)
 
 # Sélectionner toutes les colonnes numériques (en excluant la colonne "Label")
-numerical_columns = [col for col in train.columns if col not in ["Label", "IP"]]
+numerical_columns = [col for col in train.columns if col not in ["Label", "Source IP"]]
 
 # Appliquer la normalisation Min-Max sur les données d'entraînement et de test
 scaler = MinMaxScaler().fit(train[numerical_columns])
 train[numerical_columns] = scaler.transform(train[numerical_columns])
 test[numerical_columns] = scaler.transform(test[numerical_columns])
 
-# Séparation des features et du label
+# Séparation des IPs
+ip_train = train.pop("Source IP").values
+ip_test = test.pop("Source IP").values
+
+# Séparation des labels
 y_train = train.pop("Label").values
-X_train = train.values
 y_test = test.pop("Label").values
+
+# Features
+X_train = train.values
 X_test = test.values
 
 # Définition des poids de classes pour favoriser le recall de Benign (classe 0)
@@ -63,6 +69,7 @@ niveaux_confiance = [niveau_confiance(np.max(prob)) for prob in y_probs]
 
 # Création d'un DataFrame récapitulatif des résultats
 result_df = pd.DataFrame({
+    "Source IP": ip_test,
     "Vraie Classe": y_test,
     "Prédiction": y_pred,
     "Proba max": [np.max(prob) for prob in y_probs],
