@@ -110,6 +110,7 @@ def compute_metrics(flow):
     total_bytes = sum(flow['packet_lengths'])
     
     # Informations de base
+    metrics['Source IP'] = flow['src']
     metrics['Destination Port'] = flow['dport']
     metrics['Flow Duration'] = duration
     metrics['Total Fwd Packets'] = len(flow['fwd_packet_lengths'])
@@ -249,7 +250,7 @@ def compute_metrics(flow):
     metrics['Idle Min'] = 0
 
     # Label (à renseigner si besoin)
-    metrics['Label'] = 'Benign'
+    metrics['Label'] = 'Unknown'
     
     return metrics
 
@@ -260,7 +261,7 @@ def main():
 
     # Liste des champs (ordre exact pour le CSV)
     fieldnames = [
-        "Destination Port", "Flow Duration", "Total Fwd Packets", "Total Backward Packets",
+        "Source IP", "Destination Port", "Flow Duration", "Total Fwd Packets", "Total Backward Packets",
         "Total Length of Fwd Packets", "Total Length of Bwd Packets", "Fwd Packet Length Max",
         "Fwd Packet Length Min", "Fwd Packet Length Mean", "Fwd Packet Length Std",
         "Bwd Packet Length Max", "Bwd Packet Length Min", "Bwd Packet Length Mean", "Bwd Packet Length Std",
