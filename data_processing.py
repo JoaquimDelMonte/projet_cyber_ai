@@ -57,10 +57,10 @@ df_balanced = pd.concat([df_benign, df_ddos, df_ftp, df_ssh], axis=0).reset_inde
 df_balanced.replace({"Benign": 0, "DDoS": 1, "FTP-BruteForce" : 2, "SSH-Bruteforce" : 3}, inplace=True)
 
 # Génération d'une colonne d'IP aléatoires
-df_balanced["IP"] = [generate_random_ip() for _ in range(len(df_balanced))]
+df_balanced["Source IP"] = [generate_random_ip() for _ in range(len(df_balanced))]
 
 # Déplacer la colonne "IP" en première position
-cols = ["IP"] + [col for col in df_balanced.columns if col != "IP"]
+cols = ["Source IP"] + [col for col in df_balanced.columns if col != "Source IP"]
 df_balanced = df_balanced[cols]
 
 # Sauvegarde
@@ -70,3 +70,4 @@ print("✅ Traitement des données terminé ! Dataset sauvegardé sous 'dataset_
 # Sauvegarder le dataset prétraité et équilibré
 df_balanced.to_csv("dataset_new_balanced.csv", index=False)
 print("Traitement des données terminé!")
+
