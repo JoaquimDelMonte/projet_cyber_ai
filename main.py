@@ -13,15 +13,19 @@ import matplotlib.pyplot as plt
 
 def ascii_welcome():
     art = r"""
-  ____  _             _        _ _           _   
- |  _ \| |           | |      (_) |         | |  
- | |_) | | __ _ _ __ | | __    _| |__   ___ | |_ 
- |  _ <| |/ _` | '_ \| |/ /   | | '_ \ / _ \| __|
- | |_) | | (_| | | | |   <    | | |_) | (_) | |_ 
- |____/|_|\__,_|_| |_|_|\_\   |_|_.__/ \___/ \__|
+
+  _   _      _   _   _ _       _       _____           
+ | \ | |    | | | \ | (_)     (_)     |_   _|          
+ |  \| | ___| |_|  \| |_ _ __  _  __ _  | |  _ __  ___ 
+ | . ` |/ _ \ __| . ` | | '_ \| |/ _` | | | | '_ \/ __|
+ | |\  |  __/ |_| |\  | | | | | | (_| |_| |_| |_) \__ \
+ |_| \_|\___|\__|_| \_|_|_| |_| |\__,_|_____| .__/|___/
+                             _/ |           | |        
+                            |__/            |_|        
+
     """
     print(art)
-    print("Bienvenue dans le système de prédiction IDS !\n")
+    print("Bienvenue Sur NetNinjaIps !\n")
 
 def niveau_confiance(proba_max):
     """
@@ -147,8 +151,15 @@ def main():
                     conf = niveau_confiance(max_proba)
                     instance_index = last_processed + i + 1
                     list = ["Benign", "DDoS", "FTP-BruteForce", "SSH-Bruteforce"]
-                    print(f"Instance {instance_index} : Prédiction = {list[predictions[i]]}, Proba max = {max_proba:.4f}, Niveau de confiance = {conf}, IP = {ips.iloc[instance_index-1]}")
-                
+                    if predictions[i] != 0 :
+                        if conf == 1 :
+                            print(f"Suspicions d'attaque : {list[predictions[i]]}, IP : {ips.iloc[instance_index-1]} Niveau de confiance =  {conf}")
+                        if conf == 2 :
+                            print(f"Attaque probable : {list[predictions[i]]}, IP : {ips.iloc[instance_index-1]} Niveau de confiance =  {conf}")
+                            print(f"Bloquage de l'ip pendant une heure : iptables -A INPUT -s [{ips.iloc[instance_index-1]}] -j DROP \n at now + 1 hour << EOF \n iptables -D INPUT -s [{ips.iloc[instance_index-1]}] -j DROP \n EOF")
+                        if conf == 3 :
+                            print(f"Attaque certaine : {list[predictions[i]]}, IP : {ips.iloc[instance_index-1]} Niveau de confiance =  {conf}")
+                            print(f"Bloquage de l'ip : iptables -A INPUT -s [{ips.iloc[instance_index-1]}] -j DROP && iptables -A OUTPUT -s [{ips.iloc[instance_index-1]}] -j DROP")
                 last_processed = data.shape[0]
             # Pause avant la prochaine vérification
             time.sleep(2)
