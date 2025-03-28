@@ -9,22 +9,15 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
 
-# Fixer une graine aléatoire pour la reproductibilité
 RANDOM_STATE_SEED = 12
-
-# Charger le nouveau dataset prétraité et équilibré
 df = pd.read_csv("dataset_new_balanced.csv")
-
-# Nettoyer les noms de colonnes (supprimer les espaces inutiles)
 df.columns = df.columns.str.strip()
-
-# Séparation des données en ensemble d'entraînement (80%) et de test (20%)
 train, test = train_test_split(df, test_size=0.2, random_state=RANDOM_STATE_SEED)
 
-# Sélectionner toutes les colonnes numériques (en excluant la colonne "Label")
+# Sélectionner toutes les colonnes numériques (en excluant la colonne "Label" et "Source IP")
 numerical_columns = [col for col in train.columns if col not in ["Label", "Source IP"]]
 
-# Appliquer la normalisation Min-Max sur les données d'entraînement et de test
+# Appliquer la normalisation Min-Max
 scaler = MinMaxScaler().fit(train[numerical_columns])
 train[numerical_columns] = scaler.transform(train[numerical_columns])
 test[numerical_columns] = scaler.transform(test[numerical_columns])
@@ -41,21 +34,17 @@ y_test = test.pop("Label").values
 X_train = train.values
 X_test = test.values
 
-# Définition des poids de classes pour favoriser le recall de Benign (classe 0)
-# et améliorer la précision pour DDoS (classe 1).
-# Ici, on augmente le poids de la classe 0 (par exemple 2) et on baisse celui de la classe 1 (par exemple 0.5).
-# Les classes 2 et 3 gardent le poids par défaut (1).
+# Définition des poids de classes
 class_weights = {0: 1.8, 1: 0.6, 2: 1, 3: 1}
 
-# Initialisation et entraînement du modèle de régression logistique avec les poids de classes
+# Initialisation et entraînement du modèle
 log_reg = LogisticRegression(random_state=RANDOM_STATE_SEED, max_iter=1000, class_weight=class_weights)
 log_reg.fit(X_train, y_train)
 
-# Prédictions sur l'ensemble de test et récupération des probabilités associées
 y_pred = log_reg.predict(X_test)
 y_probs = log_reg.predict_proba(X_test)
 
-# Définition d'une fonction pour déterminer le niveau de confiance à partir de la probabilité maximale
+# Définition d'une fonction pour déterminer le niveau de confiance
 def niveau_confiance(proba_max):
     if proba_max < 0.6:
         return 1  # Faible confiance
@@ -102,6 +91,5 @@ plt.xlabel("Niveau de Confiance")
 plt.ylabel("Nombre d'exemples")
 plt.show()
 
-# Sauvegarde du modèle et du scaler
 joblib.dump(log_reg, "logistic_regression_model.pkl")
 joblib.dump(scaler, "scaler.pkl")
