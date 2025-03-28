@@ -3,6 +3,7 @@ import numpy as np
 import time
 import csv
 from collections import defaultdict
+import joblib  
 
 # Dictionnaire global pour stocker les flux
 flows = {}
@@ -255,6 +256,21 @@ def compute_metrics(flow):
     return metrics
 
 def main():
+
+############## SCALER ############################
+
+    # On charge le scaler enregistré
+    try:
+        scaler = joblib.load("scaler.pkl")
+        print("Scaler chargé avec succès.")
+    except Exception as e:
+        print(f"Erreur lors du chargement du scaler : {e}")
+        return
+
+##################################################
+
+
+
     # Remplacer 'Wi-Fi' par le nom de l'interface de capture adaptée
     capture = pyshark.LiveCapture(interface='Wi-Fi')
     print("Capture en direct démarrée sur l'interface Wi-Fi...")
@@ -295,6 +311,22 @@ def main():
             for key, flow in flows.items():
                 if now - flow['end_time'] > 10:
                     stats = compute_metrics(flow)
+                    
+
+###################### SCALER ############################
+
+                    # Normalisation des features numériques
+                    try:
+                        numerical_features = [stats[field] for field in fieldnames if field not in ["Source IP", "Label"]]
+                        scaled_features = scaler.transform([numerical_features])[0]
+                        for i, field in enumerate(fieldnames):
+                            if field not in ["Source IP", "Label"]:
+                                stats[field] = scaled_features[i]
+                    except Exception as e:
+                        print(f"Erreur lors de l'application du scaler : {e}")
+
+##########################################################
+                    
                     writer.writerow(stats)
                     csvfile.flush()
                     keys_to_remove.append(key)
