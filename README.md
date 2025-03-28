@@ -16,7 +16,7 @@ Le projet a pour objectif de développer un outil basé sur l'intelligence artif
 - Entrainement du modèle :
     python ./model.py
 
-- Lancement de la capture live : \n
+- Lancement de la capture live :  
     choisir l'interface correspondante ligne 259
     exemple : **capture = pyshark.LiveCapture(interface='Wi-Fi')**
     python ./capture.py
